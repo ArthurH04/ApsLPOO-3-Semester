@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 import models.Item;
 import models.Shop;
+import util.ItemCategory;
+import util.Status;
 import util.CsvHelper;
 
 public class Application {
@@ -17,6 +19,7 @@ public class Application {
 	private static List<Shop> shops = new ArrayList<Shop>();
 
 	public static void main(String[] args) {
+		CsvHelper.loadShops(shops, "D:\\JavaProjects\\apsLPOO-3-semester\\shop.csv");
 		menu();
 	}
 
@@ -29,19 +32,7 @@ public class Application {
 		System.out.println("4 - List data ordered by more than one criteria");
 		System.out.println("5 - List data filtered by some search");
 
-		int options = 0;
-		boolean validInput = false;
-
-		while (!validInput) {
-			try {
-				options = input.nextInt();
-				validInput = true;
-			} catch (InputMismatchException e) {
-				System.out.println("Please, enter a number.");
-				input.next();
-			}
-		}
-		input.close();
+		int options = validNumber();
 
 		switch (options) {
 		case 1:
@@ -63,21 +54,113 @@ public class Application {
 	}
 
 	private static void createShop() {
-		shops.add(new Shop(1, "Shop 1"));
-		shops.add(new Shop(2, "Shop 2"));
 
-		CsvHelper.createItemCSV2(shops, s -> s.getId() + "," + s.getName(),
-				"D:\\JavaProjects\\apsLPOO-3-semester\\arquivo.csv");
+		System.out.println("Enter the path: ");
+		String path = input.nextLine();
+
+		System.out.println("How many shops do you want to create?");
+		int shop = validNumber();
+
+		for (int i = 0; i < shop; i++) {
+			System.out.println("Enter the " + (i + 1) + "° shop name: ");
+			String name = input.nextLine();
+			shops.add(new Shop(name));
+		}
+
+		CsvHelper.createItemCSV2(shops, path);
 	}
 
 	private static void createItem() {
+		Item itemClass = new Item();
 
-		items.add(new Item(1, "Item 1", shops.get(0)));
-		items.add(new Item(2, "Item 2", shops.get(1)));
-		items.add(new Item(3, "Item 3", shops.get(0)));
+		System.out.println("Enter the path: ");
+		String path = input.next();
+		input.nextLine();
 
-		CsvHelper.createItemCSV2(items, i -> i.getId() + "," + i.getName() + "," + i.getShop(),
-				"D:\\JavaProjects\\apsLPOO-3-semester\\items.csv");
+		System.out.println("How many items do you want to create?");
+		int item = validNumber();
+
+		for (int i = 0; i < item; i++) {
+			System.out.println("Enter the " + (i + 1) + "° item name: ");
+			String name = input.next();
+			input.nextLine();
+
+			int category;
+			boolean validCategory;
+			do {
+				System.out.println("Select " + name + " category: ");
+				System.out.println("1 - Cold Cuts");
+				System.out.println("2 - Vegetables");
+				System.out.println("3 - Legumes");
+
+				category = validNumber();
+				validCategory = category > 0 && category < 3;
+
+				if (!validCategory) {
+					System.out.println("Please enter a valid number");
+				}
+			} while (!validCategory);
+
+			switch (category) {
+			case 1:
+				itemClass.setCategory(ItemCategory.COLD_CUTS);
+				break;
+			case 2:
+				itemClass.setCategory(ItemCategory.VEGETABLES);
+				break;
+			case 3:
+				itemClass.setCategory(ItemCategory.LEGUMES);
+				break;
+			}
+
+			int statusChoice;
+			boolean validStatus;
+			do {
+				System.out.println("Select " + name + " status: ");
+				System.out.println("1 - Available");
+				System.out.println("2 - Unavailable");
+				statusChoice = validNumber();
+				validStatus = statusChoice > 0 && statusChoice < 2;
+				
+				if (!validStatus) {
+					System.out.println("Please enter a valid number");
+				}
+				
+			} while (!validStatus);
+
+			switch (statusChoice) {
+			case 1:
+				itemClass.setStatus(Status.AVAILABLE);
+				break;
+			case 2:
+				itemClass.setStatus(Status.UNAVAILABLE);
+				break;
+			}
+
+			int shopChoice;
+			boolean validChoice;
+
+			do {
+				System.out.println("Select the shop: ");
+				for (int j = 0; j < shops.size(); j++) {
+					System.out.println((j + 1) + "Shop name: " + shops.get(j).getName() + "\n");
+				}
+
+				shopChoice = validNumber();
+				validChoice = shopChoice > 0 && shopChoice <= shops.size();
+
+				if (validChoice) {
+					Shop chosenShop = shops.get(shopChoice - 1);
+					items.add(new Item(name, chosenShop, itemClass.getCategory(), itemClass.getStatus()));
+
+				} else {
+					System.out.println("Please enter a valid number");
+				}
+			} while (!validChoice);
+
+		}
+
+		CsvHelper.createItemCSV2(items, path);
 	}
 
 	private static void listAll() {
@@ -87,6 +170,23 @@ public class Application {
 	}
 
 	private static void listBySearch() {
+	}
+
+	private static int validNumber() {
+		boolean isValid = false;
+		int num = 0;
+
+		while (!isValid) {
+			try {
+				num = input.nextInt();
+				input.nextLine();
+				isValid = true;
+			} catch (InputMismatchException e) {
+				System.out.println("Please enter a number.");
+				input.next();
+			}
+		}
+		return num;
 	}
 
 }

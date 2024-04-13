@@ -5,12 +5,17 @@ import java.util.List;
 
 public class Shop {
 
+	private static int nextId = 1;
 	private int id;
 	private String name;
 	private List<Item> items = new ArrayList<>();
 
-	public Shop(int id, String name) {
-		this.id = id;
+	public Shop() {
+
+	}
+
+	public Shop(String name) {
+		this.id = nextId++;
 		this.name = name;
 	}
 
@@ -42,7 +47,5 @@ public class Shop {
 	public String toString() {
 		return getName();
 	}
-	
-	
 
 }
