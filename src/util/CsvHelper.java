@@ -17,7 +17,7 @@ import models.Item;
 import models.Shop;
 
 public class CsvHelper {
-	public static <T> void createItemCSV2(List<T> list, String path) {
+	public static <T> void createCSV(List<T> list, String path) {
 
 		try {
 			OutputStream outputStream = new FileOutputStream(path);

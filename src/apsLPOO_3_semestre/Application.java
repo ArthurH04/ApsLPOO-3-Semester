@@ -19,7 +19,6 @@ public class Application {
 	private static List<Shop> shops = new ArrayList<Shop>();
 
 	public static void main(String[] args) {
-		CsvHelper.loadShops(shops, "D:\\JavaProjects\\apsLPOO-3-semester\\shop.csv");
 		menu();
 	}
 
@@ -67,11 +66,12 @@ public class Application {
 			shops.add(new Shop(name));
 		}
 
-		CsvHelper.createItemCSV2(shops, path);
+		CsvHelper.createCSV(shops, path);
 	}
 
 	private static void createItem() {
 		Item itemClass = new Item();
+		CsvHelper.loadShops(shops, "D:\\JavaProjects\\apsLPOO-3-semester\\shop.csv");
 
 		System.out.println("Enter the path: ");
 		String path = input.next();
@@ -160,7 +160,7 @@ public class Application {
 
 		}
 
-		CsvHelper.createItemCSV2(items, path);
+		CsvHelper.createCSV(items, path);
 	}
 
 	private static void listAll() {
