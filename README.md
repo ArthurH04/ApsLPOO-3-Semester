@@ -24,6 +24,6 @@ b. List data sorted by more than one criterion
 c. List data filtered by some search  
 d. Add data from, at least, one of the classes.  
 
-To improve the visualization of the project, the following UML was developed:
+#### To improve the visualization of the project, the following UML was developed:
 
 ![UML](https://github.com/ArthurH04/ApsLPOO-3-Semester/blob/main/UML.png)
