@@ -1,52 +1,36 @@
 package models;
 
-import java.util.Locale.Category;
+import java.util.ArrayList;
+import java.util.List;
 
 import util.ItemCategory;
 import util.Status;
 
-public class Item {
+public class Item extends Mall {
 
+	private int itemId;
 	private static int nextId = 1;
-	private int id;
-	private String name;
-	private Shop shop;
+	private List<Store> stores = new ArrayList<>();
 	private ItemCategory category;
 	private Status status;
 
 	public Item() {
 	}
 
-	public Item(String name, Shop shop, ItemCategory category, Status status) {
-		this.id = nextId++;
-		this.name = name;
-		this.shop = shop;
+	public Item(String name, List<Store> stores, ItemCategory category, Status status) {
+		super(name);
+		this.stores = stores;
 		this.category = category;
 		this.status = status;
+		this.itemId = nextId++;
 	}
 
-	public int getId() {
-		return id;
+	public List<Store> getStores() {
+		return stores;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Shop getShop() {
-		return shop;
-	}
-
-	public void setShop(Shop shop) {
-		this.shop = shop;
+	public void setStores(List<Store> stores) {
+		this.stores = stores;
 	}
 
 	public ItemCategory getCategory() {
@@ -65,9 +49,27 @@ public class Item {
 		this.status = status;
 	}
 
+	public int getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(int itemId) {
+		this.itemId = itemId;
+	}
+
 	@Override
 	public String toString() {
-		return getId() + getName();
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for(Store store : stores) {
+			if (sb.length() > 0) {
+				sb.append(",");
+			}
+			sb.append(store.getName());
+		}
+		
+		return getItemId() + " " + getName() + " " + sb.toString() + " " + getCategory() + " " + getStatus();
 
 	}
 
