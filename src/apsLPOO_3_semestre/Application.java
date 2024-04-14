@@ -71,9 +71,13 @@ public class Application {
 
 	private static void createItem() {
 		Item itemClass = new Item();
-		CsvHelper.loadShops(shops, "D:\\JavaProjects\\apsLPOO-3-semester\\shop.csv");
+		
+		System.out.println("Enter the shop csv path: " );
+		String shopPath = input.next();
+		input.nextLine();
+		CsvHelper.loadShops(shops, shopPath);
 
-		System.out.println("Enter the path: ");
+		System.out.println("Enter the path you would like to save the items: ");
 		String path = input.next();
 		input.nextLine();
 
@@ -94,7 +98,7 @@ public class Application {
 				System.out.println("3 - Legumes");
 
 				category = validNumber();
-				validCategory = category > 0 && category < 3;
+				validCategory = category > 0 && category <= 3;
 
 				if (!validCategory) {
 					System.out.println("Please enter a valid number");
@@ -120,7 +124,7 @@ public class Application {
 				System.out.println("1 - Available");
 				System.out.println("2 - Unavailable");
 				statusChoice = validNumber();
-				validStatus = statusChoice > 0 && statusChoice < 2;
+				validStatus = statusChoice > 0 && statusChoice <= 2;
 				
 				if (!validStatus) {
 					System.out.println("Please enter a valid number");
@@ -164,6 +168,7 @@ public class Application {
 	}
 
 	private static void listAll() {
+		CsvHelper.loadShops(shops, "D:\\JavaProjects\\apsLPOO-3-semester\shop.csv");
 	}
 
 	private static void listByCriteria() {
