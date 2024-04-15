@@ -1,8 +1,8 @@
 package apsLPOO_3_semestre;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -18,13 +18,12 @@ public class Application {
 
 	private static List<Item> items = new ArrayList<Item>();
 	private static List<Store> stores = new ArrayList<Store>();
-	
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		menu();
 	}
 
-	private static void menu() {
+	private static void menu() throws IOException {
 
 		System.out.println("Welcome");
 		System.out.println("1 - Create stores");
@@ -58,7 +57,7 @@ public class Application {
 		}
 	}
 
-	private static void createStore() {
+	private static void createStore() throws IOException {
 
 		System.out.println("Enter the path you would like to save the stores: ");
 		String path = input.nextLine();
@@ -71,18 +70,28 @@ public class Application {
 			String name = input.nextLine();
 			stores.add(new Store(name));
 
-			CsvHelper.createCSV(stores, path);
+			CsvHelper.createCSV(stores, "Store", path);
 		}
 
+		decision();
 	}
 
-	private static void createItem() {
+	private static void createItem() throws IOException {
 		Item itemClass = new Item();
 
-		System.out.println("Enter the store csv path: ");
-		String storePath = input.next();
-		input.nextLine();
-		CsvHelper.loadItems(stores, storePath, "Store");
+		boolean validPath = false;
+
+		while (!validPath) {
+			try {
+				System.out.println("Enter the store csv path: ");
+				String storePath = input.next();
+				input.nextLine();
+				CsvHelper.load(stores, storePath, "Store", false);
+				validPath = true;
+			} catch (IOException e) {
+				System.out.println("Wrong path. Please try again.");
+			}
+		}
 
 		System.out.println("Enter the path you would like to save the items: ");
 		String path = input.next();
@@ -170,8 +179,8 @@ public class Application {
 
 				if (validChoice) {
 					Store chosenStore = stores.get(storeChoice - 1);
-				    List<Store> storeList = new ArrayList<>();
-				    storeList.add(chosenStore);
+					List<Store> storeList = new ArrayList<>();
+					storeList.add(chosenStore);
 					items.add(new Item(name, storeList, itemClass.getCategory(), itemClass.getStatus()));
 
 				} else {
@@ -179,31 +188,110 @@ public class Application {
 				}
 			} while (!validChoice);
 
+			CsvHelper.createCSV(items, "Item", path);
 		}
+		decision();
 
-		CsvHelper.createCSV(items, path);
 	}
 
-	private static void listStore() {
+	private static void listStore() throws IOException {
 		System.out.println("Enter the store csv path: ");
 		String storePath = input.next();
 		input.nextLine();
-		CsvHelper.loadItems(stores, storePath, "Store");
+		CsvHelper.load(stores, storePath, "Store", true);
+		decision();
 	}
-	
-	private static void listItem() {
+
+	private static void listItem() throws IOException {
 		System.out.println("Enter the item csv path: ");
 		String itemPath = input.next();
 		input.nextLine();
-		CsvHelper.loadItems(items, itemPath, "Item");
+		CsvHelper.load(items, itemPath, "Item", true);
+
+		decision();
 	}
 
-	private static void listByCriteria() {
-		CsvHelper.sortByCategoryAndStatus(items);
-		
+	private static void listByCriteria() throws IOException {
+		System.out.println("What would you like to list?");
+		System.out.println("1 - Items");
+		System.out.println("2 - Stores");
+
+		int choice;
+		boolean validChoice;
+
+		do {
+			choice = validNumber();
+			validChoice = choice > 0 && choice <= 2;
+
+			if (!validChoice) {
+				System.out.println("Please enter a valid number");
+			}
+		} while (!validChoice);
+
+		switch (choice) {
+		case 1:
+			System.out.println("Enter the item csv path: ");
+			String itemPath = input.next();
+			input.nextLine();
+			System.out.println("Sorting item by name and status: ");
+			CsvHelper.sortItemByNameAndStatus(items, itemPath, "Item", false);
+			break;
+		case 2:
+			System.out.println("Enter the store csv path: ");
+			String storePath = input.next();
+			input.nextLine();
+			System.out.println("Sorting store by name: ");
+			CsvHelper.sortStoreByName(stores, storePath, "Store", false);
+			break;
+		}
+
+		decision();
+
 	}
 
-	private static void listBySearch() {
+	private static void listBySearch() throws IOException {
+		System.out.println("What would you like to list by search?");
+		System.out.println("1 - Items");
+		System.out.println("2 - Stores");
+
+		int choice;
+		boolean validChoice;
+
+		do {
+			choice = validNumber();
+			validChoice = choice > 0 && choice <= 2;
+
+			if (!validChoice) {
+				System.out.println("Please enter a valid number");
+			}
+		} while (!validChoice);
+
+		switch (choice) {
+		case 1:
+			System.out.println("Enter the item csv path: ");
+			String itemPath = input.next();
+			input.nextLine();
+
+			System.out.println("Enter the item name: ");
+			String itemName = input.next();
+			input.nextLine();
+
+			CsvHelper.searchByName(items, itemName, itemPath, "Item", false);
+			break;
+		case 2:
+			System.out.println("Enter the store csv path: ");
+			String storePath = input.next();
+			input.nextLine();
+
+			System.out.println("Enter the store name: ");
+
+			String storeName = input.next();
+			input.nextLine();
+
+			CsvHelper.searchByName(stores, storeName, storePath, "Store", false);
+			break;
+		}
+		decision();
 	}
 
 	private static int validNumber() {
@@ -221,6 +309,35 @@ public class Application {
 			}
 		}
 		return num;
+	}
+
+	private static void decision() throws IOException {
+		System.out.println("What would you like to do? ");
+		System.out.println("1 - Menu ");
+		System.out.println("2 - Quit ");
+
+		int choice;
+		boolean validChoice;
+
+		do {
+			choice = validNumber();
+			validChoice = choice > 0 && choice <= 2;
+
+			if (!validChoice) {
+				System.out.println("Please enter a valid number");
+			}
+		} while (!validChoice);
+
+		switch (choice) {
+		case 1:
+			menu();
+			break;
+
+		case 2:
+			System.exit(0);
+			break;
+		}
+
 	}
 
 }

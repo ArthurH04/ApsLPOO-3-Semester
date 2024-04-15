@@ -1,6 +1,6 @@
 package util;
 
 public enum Status {
-	AVAILABLE,
-	UNAVAILABLE
+	UNAVAILABLE,
+	AVAILABLE
 }

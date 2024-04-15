@@ -24,6 +24,14 @@ public class Item extends Mall {
 		this.status = status;
 		this.itemId = nextId++;
 	}
+	
+	public Item(int itemId, String name, List<Store> stores, ItemCategory category, Status status) {
+		super(name);
+		this.stores = stores;
+		this.category = category;
+		this.status = status;
+		this.itemId = itemId;
+	}
 
 	public List<Store> getStores() {
 		return stores;
@@ -59,16 +67,16 @@ public class Item extends Mall {
 
 	@Override
 	public String toString() {
-		
+
 		StringBuilder sb = new StringBuilder();
-		
-		for(Store store : stores) {
+
+		for (Store store : stores) {
 			if (sb.length() > 0) {
 				sb.append(",");
 			}
 			sb.append(store.getName());
 		}
-		
+
 		return getItemId() + " " + getName() + " " + sb.toString() + " " + getCategory() + " " + getStatus();
 
 	}

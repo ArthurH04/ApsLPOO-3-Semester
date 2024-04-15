@@ -17,6 +17,11 @@ public class Store extends Mall {
 		super(name);
 		this.storeId = nextId++;
 	}
+	
+	public Store(int storeId, String name) {
+		super(name);
+		this.storeId = storeId;
+	}
 
 	public int getStoreId() {
 		return storeId;
