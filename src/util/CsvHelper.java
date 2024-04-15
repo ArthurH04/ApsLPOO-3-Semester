@@ -27,11 +27,6 @@ public class CsvHelper {
 	private static Map<String, Mall> map = new HashMap<>();
 
 	public static <T> void createCSV(List<T> list, String type, String path) {
-
-		if (!path.endsWith(".csv")) {
-			throw new Error("Invalid file extension. Please provide a path with .csv extension.");
-		}
-
 		try {
 			OutputStream outputStream = new FileOutputStream(path);
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
