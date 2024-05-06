@@ -6,18 +6,26 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-import models.Item;
+import models.Mall;
+import models.Product;
 import models.Store;
 import util.CsvHelper;
-import util.ItemCategory;
+import util.ProductCategory;
 import util.Status;
 
 public class Application {
 
 	private static Scanner input = new Scanner(System.in);
 
-	private static List<Item> items = new ArrayList<Item>();
-	private static List<Store> stores = new ArrayList<Store>();
+	private static List<Mall> malls = new ArrayList<>();
+	private static List<Store> stores = new ArrayList<>();
+	private static List<Product> products = new ArrayList<>();
+	private static final String storeType = "Store";
+	private static final String productType = "Product";
+	private static final String mallType = "Mall";
+	private static final String MALL_PATH_MSG = "Enter the mall csv path: ";
+	private static final String STORE_PATH_MSG = "Enter the store csv path: ";
+	private static final String PRODUCT_PATH_MSG = "Enter the product csv path: ";
 
 	public static void main(String[] args) throws IOException {
 		menu();
@@ -26,10 +34,10 @@ public class Application {
 	private static void menu() throws IOException {
 
 		System.out.println("Welcome");
-		System.out.println("1 - Create stores");
-		System.out.println("2 - Create items");
-		System.out.println("3 - List stores");
-		System.out.println("4 - List items");
+		System.out.println("1 - Create malls");
+		System.out.println("2 - Create stores");
+		System.out.println("3 - Create products");
+		System.out.println("4 - List");
 		System.out.println("5 - List data ordered by more than one criteria");
 		System.out.println("6 - List data filtered by some search");
 
@@ -37,16 +45,16 @@ public class Application {
 
 		switch (options) {
 		case 1:
-			createStore();
+			createMall();
 			break;
 		case 2:
-			createItem();
+			createStore();
 			break;
 		case 3:
-			listStore();
+			createProduct();
 			break;
 		case 4:
-			listItem();
+			list();
 			break;
 		case 5:
 			listByCriteria();
@@ -54,10 +62,30 @@ public class Application {
 		case 6:
 			listBySearch();
 			break;
+
 		}
 	}
 
-	private static void createStore() throws IOException {
+	private static void createMall() throws IOException, ArrayIndexOutOfBoundsException {
+		System.out.println("Enter the path you would like to save the malls: ");
+		String path = input.nextLine();
+
+		System.out.println("How many malls do you want to create?");
+		int mall = validNumber();
+
+		for (int i = 0; i < mall; i++) {
+			System.out.println("Enter the " + (i + 1) + "° mall name: ");
+			String name = input.nextLine();
+			malls.add(new Mall(name));
+
+			CsvHelper.createCSV(malls, mallType, path);
+		}
+		decision();
+	}
+
+	private static void createStore() throws IOException, ArrayIndexOutOfBoundsException {
+
+		validPath(MALL_PATH_MSG, malls, mallType, false);
 
 		System.out.println("Enter the path you would like to save the stores: ");
 		String path = input.nextLine();
@@ -67,41 +95,50 @@ public class Application {
 
 		for (int i = 0; i < store; i++) {
 			System.out.println("Enter the " + (i + 1) + "° store name: ");
-			String name = input.nextLine();
-			stores.add(new Store(name));
+			String name = input.next();
+			input.nextLine();
 
-			CsvHelper.createCSV(stores, "Store", path);
+			int mallChoice;
+			boolean validChoice;
+
+			do {
+				System.out.println("Select the mall where this store is present: ");
+				for (int j = 0; j < malls.size(); j++) {
+					System.out.println((j + 1) + " Mall name: " + malls.get(j).getName() + "\n");
+				}
+
+				mallChoice = validNumber();
+				validChoice = mallChoice > 0 && mallChoice <= malls.size();
+
+				if (validChoice) {
+					Mall chosenMall = malls.get(mallChoice - 1);
+					List<Mall> mallList = new ArrayList<>();
+					mallList.add(chosenMall);
+					stores.add(new Store(name, mallList));
+
+				} else {
+					System.out.println("Please enter a valid number");
+				}
+				CsvHelper.createCSV(stores, storeType, path);
+			} while (!validChoice);
 		}
-
 		decision();
 	}
 
-	private static void createItem() throws IOException {
-		Item itemClass = new Item();
+	private static void createProduct() throws IOException, ArrayIndexOutOfBoundsException {
+		Product productClass = new Product();
 
-		boolean validPath = false;
+		validPath(STORE_PATH_MSG, stores, storeType, false);
 
-		while (!validPath) {
-			try {
-				System.out.println("Enter the store csv path: ");
-				String storePath = input.next();
-				input.nextLine();
-				CsvHelper.load(stores, storePath, "Store", false);
-				validPath = true;
-			} catch (IOException e) {
-				System.out.println("Wrong path. Please try again.");
-			}
-		}
-
-		System.out.println("Enter the path you would like to save the items: ");
+		System.out.println("Enter the path you would like to save the products: ");
 		String path = input.next();
 		input.nextLine();
 
-		System.out.println("How many items do you want to create?");
-		int item = validNumber();
+		System.out.println("How many products do you want to create?");
+		int product = validNumber();
 
-		for (int i = 0; i < item; i++) {
-			System.out.println("Enter the " + (i + 1) + "° item name: ");
+		for (int i = 0; i < product; i++) {
+			System.out.println("Enter the " + (i + 1) + "° product name: ");
 			String name = input.next();
 			input.nextLine();
 
@@ -125,19 +162,19 @@ public class Application {
 
 			switch (category) {
 			case 1:
-				itemClass.setCategory(ItemCategory.COLD_CUTS);
+				productClass.setCategory(ProductCategory.COLD_CUTS);
 				break;
 			case 2:
-				itemClass.setCategory(ItemCategory.VEGETABLES);
+				productClass.setCategory(ProductCategory.VEGETABLES);
 				break;
 			case 3:
-				itemClass.setCategory(ItemCategory.LEGUMES);
+				productClass.setCategory(ProductCategory.LEGUMES);
 				break;
 			case 4:
-				itemClass.setCategory(ItemCategory.FRUITS);
+				productClass.setCategory(ProductCategory.FRUITS);
 				break;
 			case 5:
-				itemClass.setCategory(ItemCategory.CLOTHES);
+				productClass.setCategory(ProductCategory.CLOTHES);
 				break;
 			}
 
@@ -158,10 +195,10 @@ public class Application {
 
 			switch (statusChoice) {
 			case 1:
-				itemClass.setStatus(Status.AVAILABLE);
+				productClass.setStatus(Status.AVAILABLE);
 				break;
 			case 2:
-				itemClass.setStatus(Status.UNAVAILABLE);
+				productClass.setStatus(Status.UNAVAILABLE);
 				break;
 			}
 
@@ -181,39 +218,54 @@ public class Application {
 					Store chosenStore = stores.get(storeChoice - 1);
 					List<Store> storeList = new ArrayList<>();
 					storeList.add(chosenStore);
-					items.add(new Item(name, storeList, itemClass.getCategory(), itemClass.getStatus()));
+					products.add(new Product(name, storeList, productClass.getCategory(), productClass.getStatus()));
 
 				} else {
 					System.out.println("Please enter a valid number");
 				}
 			} while (!validChoice);
 
-			CsvHelper.createCSV(items, "Item", path);
+			CsvHelper.createCSV(products, productType, path);
 		}
 		decision();
 
 	}
 
-	private static void listStore() throws IOException {
-		System.out.println("Enter the store csv path: ");
-		String storePath = input.next();
-		input.nextLine();
-		CsvHelper.load(stores, storePath, "Store", true);
-		decision();
-	}
+	private static void list() throws IOException, ArrayIndexOutOfBoundsException {
+		System.out.println("What would you like to list?");
+		System.out.println("1 - Malls");
+		System.out.println("2 - Stores");
+		System.out.println("3 - Products");
 
-	private static void listItem() throws IOException {
-		System.out.println("Enter the item csv path: ");
-		String itemPath = input.next();
-		input.nextLine();
-		CsvHelper.load(items, itemPath, "Item", true);
+		int choice;
+		boolean validChoice;
+
+		do {
+			choice = validNumber();
+			validChoice = choice > 0 && choice <= 3;
+
+			if (!validChoice) {
+				System.out.println("Please enter a valid number");
+			}
+		} while (!validChoice);
+
+		switch (choice) {
+		case 1:
+			validPath(MALL_PATH_MSG, malls, mallType, true);
+			break;
+		case 2:
+			validPath(STORE_PATH_MSG, stores, storeType, true);
+			break;
+		case 3:
+			validPath(PRODUCT_PATH_MSG, products, productType, true);
+		}
 
 		decision();
 	}
 
 	private static void listByCriteria() throws IOException {
 		System.out.println("What would you like to list?");
-		System.out.println("1 - Items");
+		System.out.println("1 - Products");
 		System.out.println("2 - Stores");
 
 		int choice;
@@ -230,28 +282,27 @@ public class Application {
 
 		switch (choice) {
 		case 1:
-			System.out.println("Enter the item csv path: ");
-			String itemPath = input.next();
+			System.out.println("Enter the product csv path: ");
+			String productPath = input.next();
 			input.nextLine();
-			System.out.println("Sorting item by name and status: ");
-			CsvHelper.sortItemByNameAndStatus(items, itemPath, "Item", false);
+			System.out.println("Sorting product by name and status: ");
+			CsvHelper.sortProductByNameAndStatus(products, productPath, productType, false);
 			break;
 		case 2:
 			System.out.println("Enter the store csv path: ");
 			String storePath = input.next();
 			input.nextLine();
 			System.out.println("Sorting store by name: ");
-			CsvHelper.sortStoreByName(stores, storePath, "Store", false);
+			CsvHelper.sortStoreByName(stores, storePath, storeType, false);
 			break;
 		}
 
 		decision();
-
 	}
 
 	private static void listBySearch() throws IOException {
 		System.out.println("What would you like to list by search?");
-		System.out.println("1 - Items");
+		System.out.println("1 - Products");
 		System.out.println("2 - Stores");
 
 		int choice;
@@ -268,15 +319,15 @@ public class Application {
 
 		switch (choice) {
 		case 1:
-			System.out.println("Enter the item csv path: ");
-			String itemPath = input.next();
+			System.out.println("Enter the product csv path: ");
+			String productPath = input.next();
 			input.nextLine();
 
-			System.out.println("Enter the item name: ");
-			String itemName = input.next();
+			System.out.println("Enter the product name: ");
+			String productName = input.next();
 			input.nextLine();
 
-			CsvHelper.searchByName(items, itemName, itemPath, "Item", false);
+			CsvHelper.searchByName(products, productName, productPath, productType, false);
 			break;
 		case 2:
 			System.out.println("Enter the store csv path: ");
@@ -288,7 +339,7 @@ public class Application {
 			String storeName = input.next();
 			input.nextLine();
 
-			CsvHelper.searchByName(stores, storeName, storePath, "Store", false);
+			CsvHelper.searchByName(stores, storeName, storePath, storeType, false);
 			break;
 		}
 		decision();
@@ -338,6 +389,23 @@ public class Application {
 			break;
 		}
 
+	}
+
+	private static <T extends Mall> void validPath(String message, List<T> list, String type, boolean print)
+			throws IOException, ArrayIndexOutOfBoundsException {
+		boolean validPath = false;
+
+		while (!validPath) {
+			try {
+				System.out.println(message);
+				String path = input.next();
+				input.nextLine();
+				CsvHelper.load(list, path, type, print);
+				validPath = true;
+			} catch (IOException | ArrayIndexOutOfBoundsException e) {
+				System.out.println("Wrong path. Please try again.");
+			}
+		}
 	}
 
 }

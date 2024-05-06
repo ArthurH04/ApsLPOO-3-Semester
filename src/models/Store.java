@@ -7,20 +7,23 @@ public class Store extends Mall {
 
 	private int storeId;
 	private static int nextId = 1;
-	private List<Item> items = new ArrayList<>();
+	private List<Product> products = new ArrayList<>();
 	private List<Mall> malls = new ArrayList<>();
 
 	public Store() {
 	}
 
-	public Store(String name) {
+	public Store(String name, List<Mall> malls) {
 		super(name);
 		this.storeId = nextId++;
+		this.malls = malls;
 	}
-	
-	public Store(int storeId, String name) {
+
+	public Store(int storeId, String name, List<Mall> malls) {
 		super(name);
 		this.storeId = storeId;
+		this.malls = malls;
+
 	}
 
 	public int getStoreId() {
@@ -31,12 +34,20 @@ public class Store extends Mall {
 		this.storeId = storeId;
 	}
 
-	public List<Item> getItems() {
-		return items;
+	public List<Product> getProducts() {
+		return products;
 	}
 
-	public void setItems(List<Item> items) {
-		this.items = items;
+	public void setProducts(List<Product> products) {
+		this.products = products;
+	}
+
+	public List<Mall> getMalls() {
+		return malls;
+	}
+
+	public void setMalls(List<Mall> malls) {
+		this.malls = malls;
 	}
 
 	@Override
